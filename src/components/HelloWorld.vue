@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <p>hola</p>
+    <p>hola1</p>
   </v-container>
 </template>
 
