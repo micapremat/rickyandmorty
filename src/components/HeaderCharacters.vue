@@ -2,7 +2,7 @@
 <template>
   <v-container class="header-background">
         <v-img src="@/assets/img/rickyAndMortyLogo.png" width="347" class="logo-img"></v-img>
-        <v-autocomplete
+        <v-combobox
         filled
         background-color="#081F32"
         prepend-inner-icon="mdi-magnify"
@@ -10,8 +10,12 @@
         dark
         label="Buscar personaje..."
         append-icon=""
+        :items="allCharacters"
+        item-value="name"
+        item-text="name"
+        v-model="search"
         >
-        </v-autocomplete>
+        </v-combobox>
   </v-container>
 </template>
 
@@ -23,8 +27,32 @@ export default {
     return {
     }
   },
+  computed: {
+    allCharacters: {
+      get () {
+        return this.$store.getters.getAllCharacters
+      }
+    },
+    search: {
+      get () {
+        return this.$store.getters.getSearch
+      },
+      set (value) {
+        return this.$store.commit('setSearch', value)
+      }
+    }
+  },
+  watch: {
+    search (newVal, oldVal) {
+      if (newVal !== oldVal) {
+        console.log(newVal)
+        this.$store.commit('setSearch', newVal)
+      }
+    }
+  },
   mounted () {
-    console.log(this.searchIcon)
+  },
+  methods: {
   }
 }
 </script>

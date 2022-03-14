@@ -6,7 +6,7 @@
             </header>
         </v-container>
        <body>
-           <Menu/>
+            <BodyCharacters/>
        </body>
        <footer>
        </footer>
@@ -19,7 +19,7 @@ export default {
   name: 'Characters',
   components: {
     HeaderCharacters: () => import('@/components/HeaderCharacters.vue'),
-    Menu: () => import('@/components/Menu.vue')
+    BodyCharacters: () => import('@/components/BodyCharacters.vue')
   }
 }
 </script>
