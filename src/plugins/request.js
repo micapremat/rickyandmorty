@@ -20,6 +20,16 @@ const requestPlugin = {
         reject(e)
       })
     })
+  },
+  getEpisodes (ids) {
+    return new Promise(function (resolve, reject) {
+      axios.get('https://rickandmortyapi.com/api/episode/' + ids).then((response) => {
+        resolve(response)
+      }).catch((e) => {
+        console.log('error: ', e)
+        reject(e)
+      })
+    })
   }
 }
 export default requestPlugin

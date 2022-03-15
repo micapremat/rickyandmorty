@@ -16,7 +16,7 @@
     </v-row>
     <v-row class="body-characters" v-if="filteredCharacters.length > 0">
         <v-col cols="4" v-for="character in filteredCharacters" :key="character.id">
-          <v-row class="card mr-1 mb-1">
+          <v-row class="card mr-1 mb-1" @click="openCharModal(character)">
             <v-col class="pa-0">
               <v-img :src="character.image" width="140" class="char-img">
                 <v-icon class="btn-inside">mdi-star-outline</v-icon>
@@ -51,6 +51,7 @@
       <h3 class="no-content-text mt-5">¡Pareces perdido en tu viaje!</h3>
       <v-btn rounded @click="cleanFilter()" class="no-content-text no-content-btn text-capitalize my-5" color="#11555F" dark>Eliminar filtros </v-btn>
     </v-row>
+    <CharacterModal v-if="openModal" :isOpenModal="openModal" :character="character" @close="close"/>
     </v-container>
 </template>
 
@@ -59,11 +60,14 @@
 export default {
   name: 'BodyCharacters',
   components: {
+    CharacterModal: () => import('@/components/CharacterModal.vue')
   },
   data () {
     return {
       filteredCharacters: [],
-      noResults: false
+      noResults: false,
+      openModal: false,
+      character: undefined
     }
   },
   mounted () {
@@ -124,12 +128,18 @@ export default {
     },
     cleanFilter () {
       this.filteredCharacters = this.allCharacters
+    },
+    close () {
+      this.openModal = false
+    },
+    openCharModal (c) {
+      this.character = c
+      this.openModal = true
     }
   }
 }
 </script>
 <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Montserrat&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Montserrat&display=swap');
   .characters-container{
     max-width: 100%;
@@ -173,6 +183,7 @@ export default {
   .card{
     border: 1px solid #ccc;
     border-radius: 10px;
+    cursor: pointer;
   }
   .char-img{
     border-bottom-left-radius: 10px;
