@@ -12,7 +12,13 @@
         </v-app-bar>
       </v-container>
     <v-row class="mt-8 body-characters">
-      Mostrar favoritos: <v-btn text class="mt-n1 ml-1" icon><v-icon>mdi-star-outline</v-icon></v-btn>
+      Mostrar favoritos:
+      <v-btn text class="mt-n2 ml-1 mb-5" icon @click="showAllFavorites()" v-if="!showFavorites">
+        <v-icon>mdi-star-outline</v-icon>
+      </v-btn>
+      <v-btn text class="mt-n2 ml-1 mb-5" icon @click="showAllFavorites()" v-else>
+        <v-icon class="btn-inside-yellow">mdi-star</v-icon>
+      </v-btn>
     </v-row>
     <v-row class="body-characters" v-if="filteredCharacters.length > 0">
         <v-col cols="4" v-for="character in filteredCharacters" :key="character.id+changeKey">
@@ -58,7 +64,7 @@
       <h3 class="no-content-text mt-5">¡Pareces perdido en tu viaje!</h3>
       <v-btn rounded @click="cleanFilter()" class="no-content-text no-content-btn text-capitalize my-5" color="#11555F" dark>Eliminar filtros </v-btn>
     </v-row>
-    <div class="text-center mb-2">
+    <div class="text-center mb-2" v-if="!showFavorites">
       <v-pagination
         v-model="page"
         :length="allPages"
@@ -88,7 +94,9 @@ export default {
       allPages: 1,
       isFavorite: false,
       arrayFavorites: [],
-      changeKey: 0
+      changeKey: 0,
+      showFavorites: false,
+      maxPages: 0
     }
   },
   mounted () {
@@ -132,9 +140,10 @@ export default {
   methods: {
     getCharacters () {
       this.$request.getCharacters().then(resp => {
-        // this.allCharacters = resp.data.results
+        this.allCharacters = resp.data.results
         this.filteredCharacters = resp.data.results
         this.allPages = resp.data.info.pages
+        this.maxPages = this.allPages
         console.log(resp.data.info.pages)
       })
         .catch((e) => {
@@ -143,7 +152,6 @@ export default {
     },
     getCharacterByPage () {
       this.$request.getCharacterByPage(this.page).then(resp => {
-        this.allCharacters = resp.data.results
         this.filteredCharacters = resp.data.results
         console.log(resp.data)
         resp.data.forEach(e => {
@@ -154,15 +162,32 @@ export default {
           console.log('Error: ', e)
         })
     },
-    filter (gender) {
+    async filter (gender) {
       if (gender === 'all') {
         this.filteredCharacters = this.allCharacters
+        this.allPages = this.maxPages
+        this.showFavorites = false
       } else {
-        this.filteredCharacters = this.allCharacters.filter(c => c.gender.toLowerCase() === gender.toLowerCase())
+        await this.$request.getFilteredCharacters('gender', gender).then(resp => {
+          this.filteredCharacters = resp.data.results
+          this.allPages = resp.data.info.pages
+          this.showFavorites = false
+        })
+          .catch((e) => {
+            console.log('Error: ', e)
+          })
       }
+      this.filteredCharacters.forEach(e => {
+        const isFavorite = this.arrayFavorites.filter(f => e.id === f.id)
+        if (isFavorite.length > 0) {
+          e.isFavorite = true
+        }
+      })
+      this.changeKey++
     },
     cleanFilter () {
       this.filteredCharacters = this.allCharacters
+      this.page = 1
     },
     close () {
       this.openModal = false
@@ -178,6 +203,15 @@ export default {
         this.arrayFavorites.push(character)
       } else {
         this.arrayFavorites = this.arrayFavorites.filter(e => e.id !== character.id)
+      }
+    },
+    showAllFavorites () {
+      this.showFavorites = !this.showFavorites
+      if (this.showFavorites) {
+        this.filteredCharacters = this.arrayFavorites
+      } else {
+        this.page = 1
+        this.filteredCharacters = this.allCharacters
       }
     }
   }
