@@ -51,6 +51,15 @@
       <h3 class="no-content-text mt-5">¡Pareces perdido en tu viaje!</h3>
       <v-btn rounded @click="cleanFilter()" class="no-content-text no-content-btn text-capitalize my-5" color="#11555F" dark>Eliminar filtros </v-btn>
     </v-row>
+    <div class="text-center mb-2">
+      <v-pagination
+        v-model="page"
+        :length="allPages"
+        circle
+        :total-visible="5"
+        @input="getCharacterByPage()"
+      ></v-pagination>
+    </div>
     <CharacterModal v-if="openModal" :isOpenModal="openModal" :character="character" @close="close"/>
     </v-container>
 </template>
@@ -67,7 +76,9 @@ export default {
       filteredCharacters: [],
       noResults: false,
       openModal: false,
-      character: undefined
+      character: undefined,
+      page: 1,
+      allPages: 1
     }
   },
   mounted () {
@@ -111,9 +122,20 @@ export default {
   methods: {
     getCharacters () {
       this.$request.getCharacters().then(resp => {
+        // this.allCharacters = resp.data.results
+        this.filteredCharacters = resp.data.results
+        this.allPages = resp.data.info.pages
+        console.log(resp.data.info.pages)
+      })
+        .catch((e) => {
+          console.log('Error: ', e)
+        })
+    },
+    getCharacterByPage () {
+      this.$request.getCharacterByPage(this.page).then(resp => {
         this.allCharacters = resp.data.results
         this.filteredCharacters = resp.data.results
-        console.log(this.allCharacters)
+        console.log(resp.data)
       })
         .catch((e) => {
           console.log('Error: ', e)
