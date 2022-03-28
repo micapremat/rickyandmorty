@@ -12,14 +12,14 @@
         </v-app-bar>
       </v-container>
     <v-row class="mt-8 body-characters">
-      Mostrar favoritos: <v-btn text class="mt-n1"><v-icon>mdi-star-outline</v-icon></v-btn>
+      Mostrar favoritos: <v-btn text class="mt-n1 ml-1" icon><v-icon>mdi-star-outline</v-icon></v-btn>
     </v-row>
     <v-row class="body-characters" v-if="filteredCharacters.length > 0">
-        <v-col cols="4" v-for="character in filteredCharacters" :key="character.id">
+        <v-col cols="4" v-for="character in filteredCharacters" :key="character.id+changeKey">
+          <v-row>
           <v-row class="card mr-1 mb-1" @click="openCharModal(character)">
             <v-col class="pa-0">
               <v-img :src="character.image" width="140" class="char-img">
-                <v-icon class="btn-inside">mdi-star-outline</v-icon>
               </v-img>
             </v-col>
             <v-col class="card-character">
@@ -44,6 +44,13 @@
               </v-row>
             </v-col>
           </v-row>
+          <v-btn text icon class="btn-star" @click="favorite(character)" v-if="!character.isFavorite">
+                <v-icon class="btn-inside" >mdi-star-outline</v-icon>
+                </v-btn>
+                <v-btn text icon class="btn-star btn-star-yellow"  @click="favorite(character)"  v-else>
+                <v-icon class="btn-inside-yellow">mdi-star</v-icon>
+                </v-btn>
+    </v-row>
         </v-col>
     </v-row>
     <v-row class="no-content no-content-text" v-if="noResults">
@@ -78,7 +85,10 @@ export default {
       openModal: false,
       character: undefined,
       page: 1,
-      allPages: 1
+      allPages: 1,
+      isFavorite: false,
+      arrayFavorites: [],
+      changeKey: 0
     }
   },
   mounted () {
@@ -136,6 +146,9 @@ export default {
         this.allCharacters = resp.data.results
         this.filteredCharacters = resp.data.results
         console.log(resp.data)
+        resp.data.forEach(e => {
+          e.isFavorite = false
+        })
       })
         .catch((e) => {
           console.log('Error: ', e)
@@ -157,6 +170,15 @@ export default {
     openCharModal (c) {
       this.character = c
       this.openModal = true
+    },
+    favorite (character) {
+      this.changeKey++
+      character.isFavorite = !character.isFavorite
+      if (character.isFavorite) {
+        this.arrayFavorites.push(character)
+      } else {
+        this.arrayFavorites = this.arrayFavorites.filter(e => e.id !== character.id)
+      }
     }
   }
 }
@@ -196,11 +218,12 @@ export default {
     width: 20px;
   }
   .btn-inside{
-    position: absolute!important;
-    right: 0!important;
-    bottom: 0!important;
-    font-size: 30px!important;
+    font-size: 34px!important;
     cursor: pointer;
+  }
+  .btn-inside-yellow{
+    color: #e0d31d!important;
+    font-size: 34px!important;
   }
   .card{
     border: 1px solid #ccc;
@@ -210,6 +233,11 @@ export default {
   .char-img{
     border-bottom-left-radius: 10px;
     border-top-left-radius: 10px;
+  }
+  .btn-star{
+    position: relative;
+    top: 90px;
+    right: 200px;
   }
   .alive-icon{
     font-size: 8px!important;
