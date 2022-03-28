@@ -3,11 +3,11 @@
       <v-container class="ma-0 pa-0 menu-container">
         <v-app-bar class="bar">
         <v-tabs color="#34C759" centered>
-              <v-tab class="tab-menu text-capitalize" @click="filter('all')">All</v-tab>
-              <v-tab class="tab-menu text-capitalize" @click="filter('Unknown')">Unknown</v-tab>
-              <v-tab class="tab-menu text-capitalize" @click="filter('Female')">Female</v-tab>
-              <v-tab class="tab-menu text-capitalize" @click="filter('Male')">Male</v-tab>
-              <v-tab class="tab-menu text-capitalize" @click="filter('Genderless')">Genderless</v-tab>
+              <v-tab class="tab-menu text-capitalize" @click="filter('gender','all')">All</v-tab>
+              <v-tab class="tab-menu text-capitalize" @click="filter('gender', 'Unknown')">Unknown</v-tab>
+              <v-tab class="tab-menu text-capitalize" @click="filter('gender', 'Female')">Female</v-tab>
+              <v-tab class="tab-menu text-capitalize" @click="filter('gender', 'Male')">Male</v-tab>
+              <v-tab class="tab-menu text-capitalize" @click="filter('gender', 'Genderless')">Genderless</v-tab>
             </v-tabs>
         </v-app-bar>
       </v-container>
@@ -125,8 +125,8 @@ export default {
       console.log(newVal)
       if (newVal !== null && newVal !== oldVal) {
         this.noResults = false
-        if (newVal.name !== undefined) {
-          this.filteredCharacters = this.allCharacters.filter(c => c.name.toLowerCase() === newVal?.name.toLowerCase())
+        if (newVal !== undefined) {
+          this.filter('name', newVal)
         } else {
           this.noResults = true
           this.filteredCharacters = []
@@ -162,13 +162,13 @@ export default {
           console.log('Error: ', e)
         })
     },
-    async filter (gender) {
+    async filter (type, gender) {
       if (gender === 'all') {
         this.filteredCharacters = this.allCharacters
         this.allPages = this.maxPages
         this.showFavorites = false
       } else {
-        await this.$request.getFilteredCharacters('gender', gender).then(resp => {
+        await this.$request.getFilteredCharacters(type, gender).then(resp => {
           this.filteredCharacters = resp.data.results
           this.allPages = resp.data.info.pages
           this.showFavorites = false
