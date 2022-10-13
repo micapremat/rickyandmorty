@@ -42,6 +42,7 @@ const requestPlugin = {
     })
   },
   getFilteredCharacters (filterType, filter) {
+    console.log(filter)
     return new Promise(function (resolve, reject) {
       axios.get('https://rickandmortyapi.com/api/character/?' + filterType + '=' + filter).then((response) => {
         resolve(response)

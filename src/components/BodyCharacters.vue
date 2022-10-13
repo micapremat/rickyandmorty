@@ -126,7 +126,8 @@ export default {
       if (newVal !== null && newVal !== oldVal) {
         this.noResults = false
         if (newVal !== undefined) {
-          this.filter('name', newVal)
+          console.log('nameeee', newVal)
+          this.filter('name', newVal.name)
         } else {
           this.noResults = true
           this.filteredCharacters = []
